@@ -100,3 +100,6 @@ Our vision is to revolutionize the recycling industry by creating a transparent,
 ---
 
 **Join us in building a transparent, sustainable future for recycled materials!**
+contract address 0xf900948F22de8C7Eb950eeF89B71c54487E56dcC
+<img width="1654" height="819" alt="Screenshot 2025-10-28 121939" src="https://github.com/user-attachments/assets/35e89923-7971-44ca-8191-7dfd90bfa4c3" />
+
