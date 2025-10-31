@@ -1,0 +1,39 @@
+name: Server availability check
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check server availability
+        env:
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$SERVER_URL" || echo "000")
+          echo "HTTP status: $status"
+
+          if [ "$status" = "000" ]; then
+            message="down"
+            color="red"
+          elif [ "$status" -ge 200 ] && [ "$status" -lt 400 ]; then
+            message="online"
+            color="green"
+          else
+            message="degraded"
+            color="yellow"
+          fi
+
+          timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          json="{\"schemaVersion\":1,\"label\":\"server\",\"message\":\"${message}\",\"color\":\"${color}\",\"namedLogo\":\"github\",\"isError\":false,\"cacheSeconds\":300,\"meta\":{\"checked_at\":\"${timestamp}\",\"http_status\":\"${status}\"}}"
+
+          mkdir -p .github
+          echo "$json" > .github/server-availability.json
+          git add .github/server-availability.json
+          git diff --staged --quiet || (git config user.email "actions@github.com" && git config user.name "GitHub Actions" && git commit -m "Update server availability: $timestamp" && git push)
